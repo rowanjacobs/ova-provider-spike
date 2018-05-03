@@ -76,13 +76,18 @@ func resourceTemplateCreate(d *schema.ResourceData, m interface{}) error {
 	}
 	datastore := datastoreObj.(*object.Datastore)
 
+	datacenter := d.Get("datacenter").(string)
+	dc, err := helper.Datacenter(client, datacenter)
+	if err != nil {
+		return fmt.Errorf("Get datacenter: %s", err)
+	}
+
 	folder, err := helper.FromAbsolutePath(client, d.Get("folder").(string))
 	if err != nil {
 		return err
 	}
 
-	urls, err := helper.Import(context.Background(), path, client, pool, datastore, folder)
-
+	urls, err := helper.Import(context.Background(), path, client, pool, datastore, dc, folder)
 	if err != nil {
 		return err
 	}
